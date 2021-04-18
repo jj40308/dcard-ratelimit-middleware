@@ -1,0 +1,18 @@
+language: go
+
+go:
+    - 1.16.x
+
+env: GO111MODULE=on
+
+before_install:
+  - if [[ "${GO111MODULE}" = "on" ]]; then mkdir "${HOME}/go"; export GOPATH="${HOME}/go"; fi
+
+install:
+  - if [[ "${GO111MODULE}" = "on" ]]; then go mod download; fi
+  - if [[ "${GO111MODULE}" = "on" ]]; then export PATH="${GOPATH}/bin:${GOROOT}/bin:${PATH}"; fi
+
+script:
+    - make fmt-check
+    - make lint
+    - make test
