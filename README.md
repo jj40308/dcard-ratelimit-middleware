@@ -35,3 +35,13 @@ Integration test
 docker-compose up -d
 make integration-test
 ```
+
+Gofmt
+```bash
+make fmt
+```
+
+GoLint
+```bash
+make lint
+```

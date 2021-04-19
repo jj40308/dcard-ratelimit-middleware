@@ -26,11 +26,11 @@ func NewRateLimit(redisClient *redis.Client, period time.Duration, calls int) *R
 }
 
 // Check the remaining requests
-func (r *RateLimit) Check(ip string) (int, error) {
+func (r *RateLimit) Check(ip string) (int, int, error) {
 	rc := r.redisClient
 	value, errGet := rc.Get(ctx, ip).Result()
 	if errGet != nil && errGet != redis.Nil {
-		return -1, errGet
+		return -1, -1, errGet
 	}
 	count, _ := strconv.Atoi(value)
 
@@ -38,13 +38,13 @@ func (r *RateLimit) Check(ip string) (int, error) {
 	remaining := r.calls - count
 
 	if remaining == -1 {
-		return remaining, nil
+		return -1, remaining, nil
 	}
 
 	errSet := rc.Set(ctx, ip, count, r.period).Err()
 	if errSet != nil {
-		return -1, errSet
+		return -1, -1, errSet
 	}
 
-	return remaining, nil
+	return count, remaining, nil
 }

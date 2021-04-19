@@ -20,7 +20,7 @@ func NewRateLimiter(rateLimit *lib.RateLimit) *RateLimiter {
 func (r *RateLimiter) CheckRateLimit() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ip := c.ClientIP()
-		remaining, err := r.rateLimit.Check(ip)
+		count, remaining, err := r.rateLimit.Check(ip)
 
 		if remaining < 0 {
 			if err != nil {
@@ -31,6 +31,7 @@ func (r *RateLimiter) CheckRateLimit() gin.HandlerFunc {
 			return
 		}
 
+		c.Set("count", count)
 		c.Set("remaining", remaining)
 		c.Header("X-RateLimit-Remaining", strconv.Itoa(remaining))
 	}

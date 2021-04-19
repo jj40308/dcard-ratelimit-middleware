@@ -20,8 +20,9 @@ func TestRateLimitCheck(t *testing.T) {
 	redisClient.Set(ctxTest, "127.0.0.1", count, 5)
 	period, calls := time.Minute, 10
 	ratelimit := NewRateLimit(redisClient, period, calls)
-	remaining, err := ratelimit.Check("127.0.0.1")
+	currentCount, remaining, err := ratelimit.Check("127.0.0.1")
 
+	assert.Equal(t, currentCount, count+1)
 	assert.Equal(t, remaining, calls-count-1)
 	assert.Equal(t, err, nil)
 }
@@ -31,8 +32,9 @@ func TestRateLimitCheckWithRedisServerError(t *testing.T) {
 
 	period, calls := time.Minute, 10
 	ratelimit := NewRateLimit(redisClient, period, calls)
-	remaining, err := ratelimit.Check("127.0.0.1")
+	currentCount, remaining, err := ratelimit.Check("127.0.0.1")
 
+	assert.Equal(t, currentCount, -1)
 	assert.Equal(t, remaining, -1)
 	assert.Equal(t, err.Error(), "Redis Server Error")
 }
