@@ -5,6 +5,8 @@ go:
 
 env: GO111MODULE=on
 
+services: docker
+
 before_install:
   - if [[ "${GO111MODULE}" = "on" ]]; then mkdir "${HOME}/go"; export GOPATH="${HOME}/go"; fi
 
@@ -16,3 +18,21 @@ script:
     - make fmt-check
     - make lint
     - make test
+
+jobs:
+    include:
+        - stage: Check
+          name: Go Format Check
+          script: make fmt-check
+        - name: Lint
+          script: make lint
+        - stage: Test
+          name: Unit test
+          script: make test
+        - stage: Build and Run Docker
+          name: Build and Run Integration test
+          script:
+              - docker build --rm -t dcard-ratelimit-middleware .
+              - docker-compose up -d
+              - docker ps
+              - make integration-test

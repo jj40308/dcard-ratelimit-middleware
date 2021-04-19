@@ -1,2 +1,4 @@
 tmp.out
 coverage.out
+tests/result.log
+result.log

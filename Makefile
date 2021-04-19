@@ -2,6 +2,7 @@ GO ?= go
 GOFMT ?= gofmt "-s"
 GOFILES := $(shell find . -name "*.go")
 TESTFOLDER := $(shell $(GO) list ./...)
+CURRENT_DIR := $(dir $(abspath $(firstword $(MAKEFILE_LIST))))
 
 .PHONY: test
 test:
@@ -43,3 +44,10 @@ lint:
 	@hash golint > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
 		$(GO) get -u golang.org/x/lint/golint; \
 	fi
+
+.PHONY: integration-test
+integration-test:
+	@hash vegeta > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		$(GO) get -u github.com/tsenart/vegeta; \
+	fi
+	sh $(CURRENT_DIR)tests/integration_tests.sh
